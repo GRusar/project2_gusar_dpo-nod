@@ -98,3 +98,70 @@ def parse_where_condition_tokens(
     value_raw = _join_tokens(value_tokens)
     converted = convert_value(value_raw, type_map[column_name])
     return {column_name: converted}
+
+
+def parse_update_tokens(
+    tokens: list[str],
+) -> tuple[str, dict[str, str], list[str] | None]:
+    if len(tokens) < 6:
+        raise ValueError("Некорректное значение: update. Попробуйте снова.")
+
+    table_name = tokens[1]
+    if tokens[2].lower() != "set":
+        raise ValueError("Некорректное значение: update. Попробуйте снова.")
+
+    where_index = None
+    for index, token in enumerate(tokens):
+        if token.lower() == "where":
+            where_index = index
+            break
+
+    if where_index is None:
+        set_tokens = tokens[3:]
+        condition_tokens = None
+    else:
+        set_tokens = tokens[3:where_index]
+        condition_tokens = tokens[where_index + 1 :]
+
+    assignments: list[list[str]] = []
+    current: list[str] = []
+    for token in set_tokens:
+        if token == ",":
+            if current:
+                assignments.append(current)
+            current = []
+        else:
+            current.append(token)
+    if current:
+        assignments.append(current)
+
+    if not assignments:
+        raise ValueError("Некорректное значение: SET. Попробуйте снова.")
+
+    set_values: dict[str, str] = {}
+    for assignment in assignments:
+        if len(assignment) < 3 or assignment[1] != "=":
+            raise ValueError("Некорректное значение: SET. Попробуйте снова.")
+        column_name = assignment[0]
+        value_raw = _join_tokens(assignment[2:])
+        set_values[column_name] = value_raw
+
+    return table_name, set_values, condition_tokens
+
+
+def parse_delete_tokens(tokens: list[str]) -> tuple[str, list[str]]:
+    if len(tokens) < 5:
+        raise ValueError("Некорректное значение: delete. Попробуйте снова.")
+
+    if tokens[1].lower() != "from":
+        raise ValueError("Некорректное значение: delete. Попробуйте снова.")
+
+    table_name = tokens[2]
+    if tokens[3].lower() != "where":
+        raise ValueError("Некорректное значение: delete. Попробуйте снова.")
+
+    condition_tokens = tokens[4:]
+    if not condition_tokens:
+        raise ValueError("Некорректное значение: WHERE. Попробуйте снова.")
+
+    return table_name, condition_tokens

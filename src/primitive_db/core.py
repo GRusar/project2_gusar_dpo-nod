@@ -122,3 +122,86 @@ def select(table_data, where_clause: dict | None = None):
         if all(record.get(key) == value for key, value in where_clause.items()):
             filtered.append(record)
     return filtered
+
+
+def update(metadata, table_name, table_data, set_values, where_clause=None):
+    if table_name not in metadata:
+        raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
+
+    schema = metadata[table_name]["table_info"]
+    type_map = {}
+    for column_def in schema:
+        name_part, type_part = column_def.split(":")
+        type_map[name_part.strip()] = type_part.strip()
+
+    for column in set_values:
+        if column not in type_map:
+            raise ValueError(
+                f'Некорректное значение: столбца "{column}" не существует.'
+            )
+
+    if table_data is None:
+        table_data = []
+
+    matched = False
+    for record in table_data:
+        if where_clause and not all(
+            record.get(key) == value for key, value in where_clause.items()
+        ):
+            continue
+        for column, value in set_values.items():
+            record[column] = convert_value(value, type_map[column])
+        print(
+            "Запись с ID={id} в таблице \"{table}\" успешно обновлена.".format(
+                id=record.get("ID"),
+                table=table_name,
+            )
+        )
+        matched = True
+
+    if not matched:
+        print("Нет записей, соответствующих условию.")
+
+    return table_data
+
+
+def delete(table_name, table_data, where_clause=None):
+    if table_data is None:
+        table_data = []
+
+    remaining = []
+    removed = []
+
+    for record in table_data:
+        if where_clause and all(
+            record.get(key) == value for key, value in where_clause.items()
+        ):
+            removed.append(record)
+            continue
+        remaining.append(record)
+
+    if not removed:
+        print("Нет записей, соответствующих условию.")
+        return table_data
+
+    for record in removed:
+        print(
+            "Запись с ID={id} успешно удалена из таблицы \"{table}\".".format(
+                id=record.get("ID"),
+                table=table_name,
+            )
+        )
+
+    return remaining
+
+
+def info(metadata, table_name, table_data):
+    if table_name not in metadata:
+        raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
+
+    schema = metadata[table_name]["table_info"]
+    count = len(table_data) if table_data else 0
+
+    print(f"Таблица: {table_name}")
+    print(f"Столбцы: {', '.join(schema)}")
+    print(f"Количество записей: {count}")
