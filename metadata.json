@@ -1,0 +1,9 @@
+{
+    "test": {
+        "table_info": [
+            "id:int",
+            "meow:str",
+            "number:int"
+        ]
+    }
+}
