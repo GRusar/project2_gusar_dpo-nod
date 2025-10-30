@@ -257,4 +257,4 @@ def print_help():
 
     print("\nОбщие команды:")
     print("<command> exit - выход из программы")
-    print("<command> help- справочная информация\n")
+    print("<command> help - справочная информация\n")
