@@ -6,6 +6,7 @@ from .core import create_table, drop_table, list_tables
 from .utils import load_metadata, save_metadata
 
 FP = "db_meta.json"
+DATA_PATH = "data/"
 
 def run():
     while True:
