@@ -14,7 +14,6 @@ def load_metadata(filepath) -> dict:
             except json.JSONDecodeError:
                 return {}
     except FileNotFoundError as e:
-        print(f"Error loading metadata from {filepath}: {e}")
         return {}
 
 def save_metadata(filepath, data) -> None:
@@ -22,7 +21,7 @@ def save_metadata(filepath, data) -> None:
         with open(filepath, 'w') as f:
             json.dump(data, f)
     except IOError as e:
-        print(f"Error saving metadata to {filepath}: {e}")
+        print(f"Ошибка сохранения метаданных в {filepath}: {e}")
 
 def load_table_data(table_name):
     path = os.path.join(DATA_PATH, f"{table_name}.json")
@@ -40,7 +39,7 @@ def save_table_data(table_name, data) -> None:
         with open(path, "w") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except IOError as e:
-        print(f"Error saving table data to {table_name}.json: {e}")
+        print(f"Ошибка сохранения данных таблицы в {table_name}.json: {e}")
 
 def delete_table_file(table_name) -> None:
     path = os.path.join(DATA_PATH, f"{table_name}.json")
@@ -48,4 +47,4 @@ def delete_table_file(table_name) -> None:
         if os.path.exists(path):
             os.remove(path)
     except OSError as e:
-        print(f"Error deleting table file {table_name}.json: {e}")
+        print(f"Ошибка удаления файла таблицы {table_name}.json: {e}")
