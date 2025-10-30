@@ -5,3 +5,4 @@ __pycache__
 # Database files
 /data/*
 !/data/.gitkeep
+!/data/db_meta.json

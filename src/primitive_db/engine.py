@@ -27,9 +27,8 @@ from .utils import (
     load_table_data,
     save_metadata,
     save_table_data,
+    META_FP as FP,
 )
-
-FP = "db_meta.json"
 
 def run():
     while True:

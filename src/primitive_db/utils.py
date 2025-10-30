@@ -3,6 +3,7 @@ import json
 import os
 
 DATA_PATH = "data"
+META_FP = os.path.join(DATA_PATH, "db_meta.json")
 os.makedirs(DATA_PATH, exist_ok=True)
 
 def load_metadata(filepath) -> dict:
