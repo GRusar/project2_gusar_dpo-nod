@@ -22,13 +22,16 @@ from .parser import (
     parse_where_condition_tokens,
 )
 from .utils import (
+    META_FP as FP,
+)
+from .utils import (
     delete_table_file,
     load_metadata,
     load_table_data,
     save_metadata,
     save_table_data,
-    META_FP as FP,
 )
+
 
 def run():
     while True:

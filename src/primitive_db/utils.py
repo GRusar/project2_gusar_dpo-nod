@@ -13,7 +13,7 @@ def load_metadata(filepath) -> dict:
                 return json.load(f)
             except json.JSONDecodeError:
                 return {}
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         return {}
 
 def save_metadata(filepath, data) -> None:
