@@ -54,8 +54,22 @@ make package-install
 Выход из программы.
 ```
 
-## Демонстрация
+## CRUD-операции
+
+- `insert into <имя> values ("текст", 123, true)` — добавить запись (ID генерируется автоматически).
+- `select from <имя>` / `select from <имя> where столбец = значение` — вывести все записи или только подходящие.
+- `update <имя> set столбец = значение where поле = условие` — изменить найденные записи.
+- `delete from <имя> where поле = условие` — удалить записи.
+- `info <имя>` — показать схему таблицы и количество записей.
+
+Все значения приводятся к типам из схемы (`int`, `str`, `bool`). Строки указывайте в кавычках, булевы значения — `true`/`false`.
+
+## Демонстрации
+### Демонстрация установки
 [![asciinema installation demo](https://asciinema.org/a/xJaX1VIWkHDkpisUaaz0LW07g.svg)](https://asciinema.org/a/xJaX1VIWkHDkpisUaaz0LW07g)
+
+### Демонстрация CRUD
+[![asciinema crud demo](https://asciinema.org/a/ZENMUZpm5a8fUotJFjVtUfb1z.svg)](https://asciinema.org/a/ZENMUZpm5a8fUotJFjVtUfb1z)
 
 
 ## Лицензия
