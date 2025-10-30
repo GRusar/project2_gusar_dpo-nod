@@ -1,6 +1,9 @@
 
 import json
-from .engine import DATA_PATH
+import os
+
+DATA_PATH = "data"
+os.makedirs(DATA_PATH, exist_ok=True)
 
 def load_metadata(filepath) -> dict:
     try:
@@ -20,20 +23,28 @@ def save_metadata(filepath, data) -> None:
     except IOError as e:
         print(f"Error saving metadata to {filepath}: {e}")
 
-def load_table_data(table_name) -> dict:
+def load_table_data(table_name):
+    path = os.path.join(DATA_PATH, f"{table_name}.json")
     try:
-        with open(f"{DATA_PATH}{table_name}.json", 'r') as f:
+        with open(path, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        print(f"Table data file {table_name}.json not found.")
-        return {}
+        return []
     except json.JSONDecodeError:
-        print(f"Error decoding JSON from {table_name}.json.")
-        return {}
+        return []
     
 def save_table_data(table_name, data) -> None:
+    path = os.path.join(DATA_PATH, f"{table_name}.json")
     try:
-        with open(f"{DATA_PATH}{table_name}.json", 'w') as f:
-            json.dump(data, f)
+        with open(path, "w") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
     except IOError as e:
         print(f"Error saving table data to {table_name}.json: {e}")
+
+def delete_table_file(table_name) -> None:
+    path = os.path.join(DATA_PATH, f"{table_name}.json")
+    try:
+        if os.path.exists(path):
+            os.remove(path)
+    except OSError as e:
+        print(f"Error deleting table file {table_name}.json: {e}")
