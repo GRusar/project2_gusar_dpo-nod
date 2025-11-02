@@ -1,4 +1,4 @@
-from ..decorators import confirm_action, handle_db_errors
+from ..decorators import confirm_action, handle_db_errors, log_time
 
 
 @handle_db_errors()
@@ -80,8 +80,8 @@ def convert_value(value, column_type: str):
         raise ValueError(f"Некорректное значение: {value}. Попробуйте снова.")
     return str(value)
 
-
 @handle_db_errors()
+@log_time
 def insert(metadata, table_name, values, table_data=None):
     if table_name not in metadata:
         raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
@@ -118,6 +118,7 @@ def insert(metadata, table_name, values, table_data=None):
 
 
 @handle_db_errors(list)
+@log_time
 def select(table_data: list[dict], where_clause: dict | None = None):
     if table_data is None:
         table_data = []
