@@ -3,6 +3,7 @@ import shlex
 import prompt
 from prettytable import PrettyTable
 
+from ..decorators import handle_db_errors
 from .core import (
     convert_value,
     create_table,
@@ -32,7 +33,7 @@ from .utils import (
     save_table_data,
 )
 
-
+@handle_db_errors()
 def run():
     while True:
         metadata = load_metadata(FP)

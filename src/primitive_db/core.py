@@ -110,7 +110,7 @@ def insert(metadata, table_name, values, table_data=None):
     return table_data
 
 
-def select(table_data, where_clause: dict | None = None):
+def select(table_data: list[dict], where_clause: dict | None = None):
     if table_data is None:
         table_data = []
 
