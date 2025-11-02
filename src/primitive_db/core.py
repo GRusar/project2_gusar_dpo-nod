@@ -1,3 +1,7 @@
+from ..decorators import confirm_action, handle_db_errors
+
+
+@handle_db_errors()
 def create_table(metadata, table_name, columns) -> dict:
     if table_name in metadata:
         raise ValueError(f'Ошибка: Таблица "{table_name}" уже существует.')
@@ -30,6 +34,8 @@ def create_table(metadata, table_name, columns) -> dict:
     return metadata
 
 
+@confirm_action("удаление таблицы")
+@handle_db_errors()
 def drop_table(metadata, table_name) -> dict:
     if table_name not in metadata:
         raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
@@ -75,6 +81,7 @@ def convert_value(value, column_type: str):
     return str(value)
 
 
+@handle_db_errors()
 def insert(metadata, table_name, values, table_data=None):
     if table_name not in metadata:
         raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
@@ -110,6 +117,7 @@ def insert(metadata, table_name, values, table_data=None):
     return table_data
 
 
+@handle_db_errors(list)
 def select(table_data: list[dict], where_clause: dict | None = None):
     if table_data is None:
         table_data = []
@@ -124,6 +132,7 @@ def select(table_data: list[dict], where_clause: dict | None = None):
     return filtered
 
 
+@handle_db_errors()
 def update(metadata, table_name, table_data, set_values, where_clause=None):
     if table_name not in metadata:
         raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
@@ -165,6 +174,7 @@ def update(metadata, table_name, table_data, set_values, where_clause=None):
     return table_data
 
 
+@confirm_action("удаление записи")
 def delete(table_name, table_data, where_clause=None):
     if table_data is None:
         table_data = []
@@ -195,6 +205,7 @@ def delete(table_name, table_data, where_clause=None):
     return remaining
 
 
+@handle_db_errors()
 def info(metadata, table_name, table_data):
     if table_name not in metadata:
         raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')

@@ -1,4 +1,3 @@
-
 import json
 import os
 
@@ -11,10 +10,7 @@ os.makedirs(DATA_PATH, exist_ok=True)
 @handle_db_errors(dict)
 def load_metadata(filepath) -> dict:
     with open(filepath, "r") as file:
-        try:
-            return json.load(file)
-        except json.JSONDecodeError:
-            return {}
+        return json.load(file)
 
 def save_metadata(filepath, data) -> None:
     try:
@@ -27,10 +23,7 @@ def save_metadata(filepath, data) -> None:
 def load_table_data(table_name) -> list[dict]:
     path = os.path.join(DATA_PATH, f"{table_name}.json")
     with open(path, "r") as file:
-        try:
-            return json.load(file)
-        except json.JSONDecodeError:
-            return []
+        return json.load(file)
 
 def save_table_data(table_name, data) -> None:
     path = os.path.join(DATA_PATH, f"{table_name}.json")

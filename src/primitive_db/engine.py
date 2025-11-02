@@ -3,7 +3,6 @@ import shlex
 import prompt
 from prettytable import PrettyTable
 
-from ..decorators import handle_db_errors
 from .core import (
     convert_value,
     create_table,
@@ -33,13 +32,17 @@ from .utils import (
     save_table_data,
 )
 
-@handle_db_errors()
+
 def run():
     while True:
         metadata = load_metadata(FP)
         user_input = prompt.string(">>> Введите команду: ")
-
-        args = shlex.split(user_input)
+        
+        try:
+            args = shlex.split(user_input)
+        except ValueError as e:
+            print(f"Некорректная команда: {e}. Попробуйте снова.")
+            continue
         if not args:
             continue
         command = args[0]
@@ -51,23 +54,23 @@ def run():
                     continue
                 table_name = args[1]
                 columns = args[2:]
-                try:
-                    metadata = create_table(metadata, table_name, columns)
-                    save_metadata(FP, metadata)
-                except ValueError as e:
-                    print(e)
+                updated_metadata = create_table(metadata, table_name, columns)
+                if updated_metadata is None:
+                    continue
+                metadata = updated_metadata
+                save_metadata(FP, metadata)
             case "drop_table":
                 if len(args) < 2:
                     invalid_value = " ".join(args[1:]) or command
                     print(f"Некорректное значение: {invalid_value}. Попробуйте снова.")
                     continue
                 table_name = args[1]
-                try:
-                    metadata = drop_table(metadata, table_name)
-                    save_metadata(FP, metadata)
-                    delete_table_file(table_name)
-                except ValueError as e:
-                    print(e)
+                updated_metadata = drop_table(metadata, table_name)
+                if updated_metadata is None:
+                    continue
+                metadata = updated_metadata
+                save_metadata(FP, metadata)
+                delete_table_file(table_name)
             case "list_tables":
                 list_tables(metadata)
             case "insert":
@@ -77,12 +80,11 @@ def run():
                     print(e)
                     continue
 
-                try:
-                    table_data = load_table_data(table_name)
-                    updated = insert(metadata, table_name, values, table_data)
-                    save_table_data(table_name, updated)
-                except ValueError as e:
-                    print(e)
+                table_data = load_table_data(table_name)
+                updated_data = insert(metadata, table_name, values, table_data)
+                if updated_data is None:
+                    continue
+                save_table_data(table_name, updated_data)
             case "select":
                 try:
                     table_name, condition_tokens = parse_select_tokens(args)
@@ -116,6 +118,8 @@ def run():
                 table_data = load_table_data(table_name)
                 rows = select(table_data, where_clause)
 
+                if rows is None:
+                    continue
                 if not rows:
                     print("Нет записей, соответствующих условию.")
                     continue
@@ -178,6 +182,8 @@ def run():
                         converted_set,
                         where_clause,
                     )
+                    if updated_data is None:
+                        continue
                     save_table_data(table_name, updated_data)
             case "delete":
                 try:
@@ -206,6 +212,8 @@ def run():
                     print(e)
                     continue
                 updated_data = delete(table_name, table_data, where_clause)
+                if updated_data is None:
+                    continue
                 save_table_data(table_name, updated_data)
             case "info":
                 if len(args) < 2:
@@ -214,10 +222,7 @@ def run():
 
                 table_name = args[1]
                 table_data = load_table_data(table_name)
-                try:
-                    info(metadata, table_name, table_data)
-                except ValueError as e:
-                    print(e)
+                info(metadata, table_name, table_data)
             case "exit":
                 print("Выход из программы.")
                 break
