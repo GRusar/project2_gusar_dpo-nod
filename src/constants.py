@@ -61,6 +61,7 @@ MSG_RECORDS_NO_MATCH = "Нет записей, соответствующих у
 MSG_RECORD_DELETED = (
     'Запись с {id_name}={record_id} успешно удалена из таблицы "{table}".'
 )
+MSG_ID_UPDATE_FORBIDDEN = 'Ошибка: Столбец "{id_name}" нельзя изменять.'
 MSG_TABLE_INFO = "Таблица: {name}"
 MSG_TABLE_COLUMNS = "Столбцы: {columns}"
 MSG_TABLE_COUNT = "Количество записей: {count}"

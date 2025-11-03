@@ -15,13 +15,13 @@ os.makedirs(DATA_PATH, exist_ok=True)
 @handle_db_errors(dict)
 def load_metadata(filepath) -> dict:
     """Читает JSON с метаданными и возвращает словарь."""
-    with open(filepath, "r") as file:
+    with open(filepath, "r", encoding="utf-8") as file:
         return json.load(file)
 
 def save_metadata(filepath, data) -> None:
     """Сохраняет метаданные в JSON-файл."""
     try:
-        with open(filepath, "w") as file:
+        with open(filepath, "w", encoding="utf-8") as file:
             json.dump(data, file)
     except IOError as error:
         print(MSG_META_SAVE_ERROR.format(filepath=filepath, error=error))
@@ -30,14 +30,14 @@ def save_metadata(filepath, data) -> None:
 def load_table_data(table_name) -> list[dict]:
     """Загружает данные таблицы из JSON-файла."""
     path = os.path.join(DATA_PATH, TABLE_FILE_TEMPLATE.format(table=table_name))
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf-8") as file:
         return json.load(file)
 
 def save_table_data(table_name, data) -> None:
     """Сохраняет данные таблицы в JSON-файл."""
     path = os.path.join(DATA_PATH, TABLE_FILE_TEMPLATE.format(table=table_name))
     try:
-        with open(path, "w") as file:
+        with open(path, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=2)
     except IOError as error:
         print(

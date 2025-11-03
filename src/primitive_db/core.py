@@ -10,6 +10,7 @@ from ..constants import (
     ID_TYPE,
     MSG_BAD_COLUMN,
     MSG_BAD_TYPE,
+    MSG_ID_UPDATE_FORBIDDEN,
     MSG_NO_COLUMNS,
     MSG_NO_TABLES,
     MSG_RECORD_DELETED,
@@ -238,6 +239,10 @@ def update(metadata, table_name, table_data, set_values, where_clause=None):
         type_map[name_part.strip()] = type_part.strip()
 
     for column in set_values:
+        if column == ID_NAME:
+            raise ValueError(
+                MSG_ID_UPDATE_FORBIDDEN.format(id_name=ID_NAME)
+            )
         if column not in type_map:
             raise ValueError(
                 f'Некорректное значение: столбца "{column}" не существует.'
