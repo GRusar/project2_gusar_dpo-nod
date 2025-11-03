@@ -89,8 +89,7 @@ make package-install
 [![asciinema crud demo](https://asciinema.org/a/ZENMUZpm5a8fUotJFjVtUfb1z.svg)](https://asciinema.org/a/ZENMUZpm5a8fUotJFjVtUfb1z)
 
 ### Демонстрация декораторов
-_(запись финальной сессии с подтверждениями и обработкой ошибок будет добавлена позже)_
-
+[![asciinema decorators demo](https://asciinema.org/a/pHMvCt9S70eXjRTzhFuSdjREh.svg)](https://asciinema.org/a/pHMvCt9S70eXjRTzhFuSdjREh)
 
 ## Лицензия
 
