@@ -14,15 +14,28 @@ from .core import (
     select,
     update,
 )
+from ..constants import (
+    COMMANDS,
+    HELP_ALIGNMENT,
+    META_FP,
+    MSG_EXIT,
+    MSG_INVALID_VALUE,
+    MSG_INVALID_INFO,
+    MSG_RECORDS_NO_MATCH,
+    MSG_TABLE_NOT_EXISTS,
+    MSG_UNKNOWN_COMMAND,
+    MSG_UNKNOWN_COLUMN,
+    MSG_PARSE_ERROR,
+    MSG_PARSE_HINT,
+    PROMPT_INPUT,
+    TABLE_INFO_KEY,
+)
 from .parser import (
     parse_delete_tokens,
     parse_insert_tokens,
     parse_select_tokens,
     parse_update_tokens,
     parse_where_condition_tokens,
-)
-from .utils import (
-    META_FP as FP,
 )
 from .utils import (
     delete_table_file,
@@ -34,17 +47,16 @@ from .utils import (
 
 
 def run():
+    """Запускает основной цикл взаимодействия с пользователем."""
     while True:
-        metadata = load_metadata(FP)
-        user_input = prompt.string(">>> Введите команду: ")
+        metadata = load_metadata(META_FP)
+        user_input = prompt.string(PROMPT_INPUT)
 
         try:
             args = shlex.split(user_input)
         except ValueError as error:
-            print(
-                f"Не удалось разобрать команду ({error}). "
-                "Проверьте синтаксис и кавычки."
-            )
+            print(MSG_PARSE_ERROR.format(error=error))
+            print(MSG_PARSE_HINT)
             continue
         if not args:
             continue
@@ -54,7 +66,7 @@ def run():
             case "create_table":
                 if len(args) < 3:
                     invalid_value = " ".join(args[1:]) or command
-                    print(f"Некорректное значение: {invalid_value}. Попробуйте снова.")
+                    print(MSG_INVALID_VALUE.format(value=invalid_value))
                     continue
                 table_name = args[1]
                 columns = args[2:]
@@ -62,18 +74,18 @@ def run():
                 if updated_metadata is None:
                     continue
                 metadata = updated_metadata
-                save_metadata(FP, metadata)
+                save_metadata(META_FP, metadata)
             case "drop_table":
                 if len(args) < 2:
                     invalid_value = " ".join(args[1:]) or command
-                    print(f"Некорректное значение: {invalid_value}. Попробуйте снова.")
+                    print(MSG_INVALID_VALUE.format(value=invalid_value))
                     continue
                 table_name = args[1]
                 updated_metadata = drop_table(metadata, table_name)
                 if updated_metadata is None:
                     continue
                 metadata = updated_metadata
-                save_metadata(FP, metadata)
+                save_metadata(META_FP, metadata)
                 delete_table_file(table_name)
             case "list_tables":
                 list_tables(metadata)
@@ -96,9 +108,9 @@ def run():
                     print(e)
                     continue
 
-                table_info = metadata.get(table_name, {}).get("table_info")
+                table_info = metadata.get(table_name, {}).get(TABLE_INFO_KEY)
                 if not table_info:
-                    print(f'Ошибка: Таблица "{table_name}" не существует.')
+                    print(MSG_TABLE_NOT_EXISTS.format(name=table_name))
                     continue
 
                 type_map = {}
@@ -124,7 +136,7 @@ def run():
                 if rows is None:
                     continue
                 if not rows:
-                    print("Нет записей, соответствующих условию.")
+                    print(MSG_RECORDS_NO_MATCH)
                     continue
 
                 table = PrettyTable()
@@ -140,9 +152,9 @@ def run():
                     print(e)
                     continue
 
-                table_info = metadata.get(table_name, {}).get("table_info")
+                table_info = metadata.get(table_name, {}).get(TABLE_INFO_KEY)
                 if not table_info:
-                    print(f'Ошибка: Таблица "{table_name}" не существует.')
+                    print(MSG_TABLE_NOT_EXISTS.format(name=table_name))
                     continue
 
                 type_map = {}
@@ -153,9 +165,7 @@ def run():
                 converted_set = {}
                 for column, raw_value in set_values.items():
                     if column not in type_map:
-                        print(
-                            f'Некорректное значение: столбца "{column}" не существует.'
-                        )
+                        print(MSG_UNKNOWN_COLUMN.format(column=column))
                         break
                     try:
                         converted_set[column] = convert_value(
@@ -195,9 +205,9 @@ def run():
                     print(e)
                     continue
 
-                table_info = metadata.get(table_name, {}).get("table_info")
+                table_info = metadata.get(table_name, {}).get(TABLE_INFO_KEY)
                 if not table_info:
-                    print(f'Ошибка: Таблица "{table_name}" не существует.')
+                    print(MSG_TABLE_NOT_EXISTS.format(name=table_name))
                     continue
 
                 type_map = {
@@ -220,53 +230,30 @@ def run():
                 save_table_data(table_name, updated_data)
             case "info":
                 if len(args) < 2:
-                    print("Некорректное значение: info. Попробуйте снова.")
+                    print(MSG_INVALID_INFO)
                     continue
 
                 table_name = args[1]
                 table_data = load_table_data(table_name)
                 info(metadata, table_name, table_data)
             case "exit":
-                print("Выход из программы.")
+                print(MSG_EXIT)
                 break
 
             case "help":
                 print_help()
             case _:
-                print(f"Функции {command} нет. Попробуйте снова.")
+                print(MSG_UNKNOWN_COMMAND.format(command=command))
 
 def welcome():
+    """Выводит приветственное сообщение и справку по командам."""
     print_help()
 
-def print_help():
-    """Prints the help message for the current mode."""
 
-    print("\n***Процесс работы с таблицей***")
-    print("Функции:")
-    print("<command> create_table <имя_таблицы> <столбец1:тип> .. - создать таблицу")
-    print("<command> list_tables - показать список всех таблиц")
-    print("<command> drop_table <имя_таблицы> - удалить таблицу")
-
-    print("\n***Операции с данными***")
-    print(
-        "<command> insert into <имя_таблицы> values (<значение1>, <значение2>, ...)"
-        " - создать запись."
-    )
-    print(
-        "<command> select from <имя_таблицы> where <столбец> = <значение>"
-        " - прочитать записи по условию."
-    )
-    print("<command> select from <имя_таблицы> - прочитать все записи.")
-    print(
-        "<command> update <имя_таблицы> set <столбец1> = <новое_значение1> "
-        "where <столбец_условия> = <значение_условия> - обновить запись."
-    )
-    print(
-        "<command> delete from <имя_таблицы> where <столбец> = <значение>"
-        " - удалить запись."
-    )
-    print("<command> info <имя_таблицы> - вывести информацию о таблице.")
-
-    print("\nОбщие команды:")
-    print("<command> exit - выход из программы")
-    print("<command> help - справочная информация\n")
+def print_help(commands: dict[str, str] = COMMANDS) -> None:
+    """
+    Выводит справку по доступным командам.
+    """
+    print("\nДоступные команды:")
+    for command, description in commands.items():
+        print(command.ljust(HELP_ALIGNMENT + 2, " ") + description)

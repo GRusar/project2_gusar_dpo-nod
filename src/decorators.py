@@ -4,6 +4,15 @@ from json import JSONDecodeError
 
 import prompt
 
+from .constants import (
+    CONFIRM_YES,
+    MSG_ACTION_CANCELLED,
+    MSG_FUNCTION_TIME,
+    MSG_DB_ERROR,
+    MSG_UNEXPECTED_ERROR,
+    PROMPT_CONFIRM_TEMPLATE,
+)
+
 
 def handle_db_errors(missing_default=None):
     def decorator(func):
@@ -20,11 +29,11 @@ def handle_db_errors(missing_default=None):
                     return missing_default()
                 return missing_default
             except KeyError as error:
-                print(f"Ошибка: Таблица или столбец {error} не найден.")
+                print(MSG_DB_ERROR.format(error=error))
             except ValueError as error:
                 print(error)
             except Exception as error:
-                print(f"Произошла непредвиденная ошибка: {error}")
+                print(MSG_UNEXPECTED_ERROR.format(error=error))
 
         return wrapper
 
@@ -36,10 +45,10 @@ def confirm_action(action_name: str):
         @wraps(func)
         def wrapper(*args, **kwargs):
             confirmation = prompt.string(
-                f'Вы уверены, что хотите выполнить "{action_name}"? [y/n]: '
+                PROMPT_CONFIRM_TEMPLATE.format(action=action_name)
             )
-            if confirmation.lower() != "y":
-                print(f"Действие '{action_name}' отменено пользователем.")
+            if confirmation.lower() not in CONFIRM_YES:
+                print(MSG_ACTION_CANCELLED.format(action=action_name))
                 return None
             return func(*args, **kwargs)
 
@@ -55,7 +64,12 @@ def log_time(func):
         result = func(*args, **kwargs)
         end_time = time.monotonic()
         elapsed_time = end_time - start_time
-        print(f"Функция {func.__name__} выполнилась за {elapsed_time:.3f} секунд.")
+        print(
+            MSG_FUNCTION_TIME.format(
+                func_name=func.__name__,
+                elapsed=elapsed_time,
+            )
+        )
         return result
 
     return wrapper
