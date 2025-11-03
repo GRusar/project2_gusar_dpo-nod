@@ -22,7 +22,7 @@ def handle_db_errors(missing_default=None):
             except KeyError as error:
                 print(f"Ошибка: Таблица или столбец {error} не найден.")
             except ValueError as error:
-                print(f"Ошибка валидации: {error}")
+                print(error)
             except Exception as error:
                 print(f"Произошла непредвиденная ошибка: {error}")
 

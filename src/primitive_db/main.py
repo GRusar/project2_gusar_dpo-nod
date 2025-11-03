@@ -4,7 +4,6 @@ from .engine import run, welcome
 
 
 def main():
-    print("DB project is running!")
     welcome()
     run()
 
