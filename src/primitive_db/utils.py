@@ -1,7 +1,6 @@
 import json
 import os
 
-from ..decorators import handle_db_errors
 from ..constants import (
     DATA_PATH,
     MSG_META_SAVE_ERROR,
@@ -9,6 +8,7 @@ from ..constants import (
     MSG_TABLE_SAVE_ERROR,
     TABLE_FILE_TEMPLATE,
 )
+from ..decorators import handle_db_errors
 
 os.makedirs(DATA_PATH, exist_ok=True)
 

@@ -7,8 +7,8 @@ import prompt
 from .constants import (
     CONFIRM_YES,
     MSG_ACTION_CANCELLED,
-    MSG_FUNCTION_TIME,
     MSG_DB_ERROR,
+    MSG_FUNCTION_TIME,
     MSG_UNEXPECTED_ERROR,
     PROMPT_CONFIRM_TEMPLATE,
 )

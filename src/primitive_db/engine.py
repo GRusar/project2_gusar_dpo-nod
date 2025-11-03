@@ -3,6 +3,22 @@ import shlex
 import prompt
 from prettytable import PrettyTable
 
+from ..constants import (
+    COMMANDS,
+    HELP_ALIGNMENT,
+    META_FP,
+    MSG_EXIT,
+    MSG_INVALID_INFO,
+    MSG_INVALID_VALUE,
+    MSG_PARSE_ERROR,
+    MSG_PARSE_HINT,
+    MSG_RECORDS_NO_MATCH,
+    MSG_TABLE_NOT_EXISTS,
+    MSG_UNKNOWN_COLUMN,
+    MSG_UNKNOWN_COMMAND,
+    PROMPT_INPUT,
+    TABLE_INFO_KEY,
+)
 from .core import (
     convert_value,
     create_table,
@@ -13,22 +29,6 @@ from .core import (
     list_tables,
     select,
     update,
-)
-from ..constants import (
-    COMMANDS,
-    HELP_ALIGNMENT,
-    META_FP,
-    MSG_EXIT,
-    MSG_INVALID_VALUE,
-    MSG_INVALID_INFO,
-    MSG_RECORDS_NO_MATCH,
-    MSG_TABLE_NOT_EXISTS,
-    MSG_UNKNOWN_COMMAND,
-    MSG_UNKNOWN_COLUMN,
-    MSG_PARSE_ERROR,
-    MSG_PARSE_HINT,
-    PROMPT_INPUT,
-    TABLE_INFO_KEY,
 )
 from .parser import (
     parse_delete_tokens,
