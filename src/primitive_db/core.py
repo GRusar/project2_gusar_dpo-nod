@@ -1,4 +1,34 @@
+from typing import Any, Callable, Hashable
+
 from ..decorators import confirm_action, handle_db_errors, log_time
+from .utils import load_table_data
+
+
+def create_cacher() -> Callable[[Hashable, Callable[[], Any]], Any]:
+    cache: dict[Hashable, Any] = {}
+
+    def cache_result(key: Hashable, value_func: Callable[[], Any]) -> Any:
+        if key not in cache:
+            cache[key] = value_func()
+        return cache[key]
+
+    def clear(table_name: str | None = None) -> None:
+        if table_name is None:
+            cache.clear()
+            return
+        matching_keys = [
+            key
+            for key in cache
+            if isinstance(key, tuple) and key and key[0] == table_name
+        ]
+        for cache_key in matching_keys:
+            cache.pop(cache_key, None)
+
+    cache_result.clear = clear  # type: ignore[attr-defined]
+    return cache_result
+
+
+_select_cache = create_cacher()
 
 
 @handle_db_errors()
@@ -12,19 +42,30 @@ def create_table(metadata, table_name, columns) -> dict:
         )
 
     valid_types = {"int", "str", "bool"}
-    has_id = any(col.split(":")[0].strip().lower() == "id" for col in columns)
-    if not has_id:
-        columns = ["ID:int"] + columns
     parsed_columns = []
+    has_id = False
 
     for column in columns:
-        if ":" not in column:
+        column_str = column.strip()
+        if ":" not in column_str:
             raise ValueError(f"Некорректное значение: {column}. Попробуйте снова.")
-        column_name, column_type = column.split(":")
+        column_name, column_type = [
+            part.strip() for part in column_str.split(":", 1)
+        ]
+        if not column_name or not column_type:
+            raise ValueError(f"Некорректное значение: {column}. Попробуйте снова.")
+
+        if column_name.lower() == "id":
+            has_id = True
+            column_name = "ID"
+            column_type = "int"
 
         if column_type not in valid_types:
             raise ValueError(f"Некорректное значение: {column_type}. Попробуйте снова.")
         parsed_columns.append(f"{column_name}:{column_type}")
+
+    if not has_id:
+        parsed_columns.insert(0, "ID:int")
 
     metadata[table_name] = {"table_info": parsed_columns}
     columns_repr = ", ".join(parsed_columns)
@@ -41,6 +82,7 @@ def drop_table(metadata, table_name) -> dict:
         raise ValueError(f'Ошибка: Таблица "{table_name}" не существует.')
 
     del metadata[table_name]
+    _select_cache.clear(table_name)
     print(f'Таблица "{table_name}" успешно удалена.')
     return metadata
 
@@ -52,6 +94,7 @@ def list_tables(metadata) -> None:
 
     for table_name in metadata:
         print(f"- {table_name}")
+
 
 def convert_value(value, column_type: str):
     if isinstance(value, str):
@@ -114,23 +157,30 @@ def insert(metadata, table_name, values, table_data=None):
     print(
         f'Запись с ID={new_id} успешно добавлена в таблицу "{table_name}".'
     )
+    _select_cache.clear(table_name)
     return table_data
 
 
 @handle_db_errors(list)
 @log_time
-def select(table_data: list[dict], where_clause: dict | None = None):
-    if table_data is None:
-        table_data = []
-
+def select(table_name: str, where_clause: dict | None = None) -> list[dict]:
+    cache_key: Hashable
     if not where_clause:
-        return list(table_data)
+        cache_key = (table_name, None)
+    else:
+        cache_key = (table_name, tuple(sorted(where_clause.items())))
 
-    filtered = []
-    for record in table_data:
-        if all(record.get(key) == value for key, value in where_clause.items()):
-            filtered.append(record)
-    return filtered
+    def compute() -> list[dict]:
+        table_data = load_table_data(table_name) or []
+        if not where_clause:
+            return [dict(record) for record in table_data]
+        filtered = []
+        for record in table_data:
+            if all(record.get(key) == value for key, value in where_clause.items()):
+                filtered.append(dict(record))
+        return filtered
+
+    return _select_cache(cache_key, compute)
 
 
 @handle_db_errors()
@@ -172,6 +222,9 @@ def update(metadata, table_name, table_data, set_values, where_clause=None):
     if not matched:
         print("Нет записей, соответствующих условию.")
 
+    if matched:
+        _select_cache.clear(table_name)
+
     return table_data
 
 
@@ -203,6 +256,7 @@ def delete(table_name, table_data, where_clause=None):
             )
         )
 
+    _select_cache.clear(table_name)
     return remaining
 
 

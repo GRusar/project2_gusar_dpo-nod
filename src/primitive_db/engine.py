@@ -37,15 +37,19 @@ def run():
     while True:
         metadata = load_metadata(FP)
         user_input = prompt.string(">>> Введите команду: ")
-        
+
         try:
             args = shlex.split(user_input)
-        except ValueError as e:
-            print(f"Некорректная команда: {e}. Попробуйте снова.")
+        except ValueError as error:
+            print(
+                f"Не удалось разобрать команду ({error}). "
+                "Проверьте синтаксис и кавычки."
+            )
             continue
         if not args:
             continue
         command = args[0]
+
         match command:
             case "create_table":
                 if len(args) < 3:
@@ -115,8 +119,7 @@ def run():
                     except ValueError as e:
                         print(e)
                         continue
-                table_data = load_table_data(table_name)
-                rows = select(table_data, where_clause)
+                rows = select(table_name, where_clause)
 
                 if rows is None:
                     continue
