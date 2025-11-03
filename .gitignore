@@ -1,3 +1,7 @@
 .venv
 dist
 __pycache__
+
+# Database files
+/data/*
+!/data/.gitkeep
