@@ -1,9 +1,9 @@
-import os
-
+# Пути и файлы данных
 DATA_PATH = "data"
 META_FILENAME = "db_meta.json"
-META_FP = os.path.join(DATA_PATH, META_FILENAME)
+META_FILE = META_FILENAME
 
+# Идентификаторы и типы полей
 ID_NAME = "ID"
 TYPE_INT = "int"
 TYPE_STR = "str"
@@ -16,6 +16,7 @@ BOOL_TRUE_LITERALS = {"true", "1"}
 BOOL_FALSE_LITERALS = {"false", "0"}
 BOOL_INT_VALUES = {0, 1}
 
+# Подсказка по командам
 COMMANDS = {
     "create_table <имя> <столбец:тип> ...": (
         "создать таблицу (столбец ID:int добавляется автоматически)"
@@ -31,16 +32,17 @@ COMMANDS = {
     "help": "показать эту справку",
     "exit": "выйти из программы",
 }
+# Формат вспомогательных сообщений
 HELP_ALIGNMENT = max(len(command) for command in COMMANDS)
-
 CONFIRM_YES = {"y"}
 
+# Сообщения пользователю
 MSG_TABLE_EXISTS = 'Ошибка: Таблица "{name}" уже существует.'
 MSG_NO_COLUMNS = "Некорректное значение: отсутствуют столбцы. Попробуйте снова."
 MSG_BAD_COLUMN = "Некорректное значение: {column}. Попробуйте снова."
 MSG_BAD_TYPE = "Некорректное значение: {value}. Попробуйте снова."
 MSG_UNKNOWN_COLUMN = 'Некорректное значение: столбца "{column}" не существует.'
-MSG_INVALID_VALUE = "Некорректное значение: {value}. Попробуйте снова."
+MSG_INVALID_VALUE = "Некорректное значение: <{value}>. Попробуйте снова."
 MSG_TYPE_REPLACED = (
     'Столбец "{id_name}" поддерживает только тип {id_type}. '
     'Значение "{column_type}" заменено на "{id_type}".'
@@ -67,13 +69,16 @@ MSG_TABLE_COLUMNS = "Столбцы: {columns}"
 MSG_TABLE_COUNT = "Количество записей: {count}"
 MSG_EXIT = "Выход из программы."
 MSG_UNKNOWN_COMMAND = "Функции {command} нет. Попробуйте снова."
-MSG_INVALID_INFO = "Некорректное значение: info. Попробуйте снова."
+MSG_INVALID_INFO = (
+    "Некорректное значение, возможно отсутствует название таблицы. Попробуйте снова."
+)
 MSG_VALUES_MISMATCH = (
     "Ошибка: Количество значений не соответствует количеству столбцов."
 )
 MSG_TABLES_PREFIX = "- {name}"
 TABLE_INFO_KEY = "table_info"
 
+# Подсказки ввода и оформления
 PROMPT_CONFIRM_DROP = "удаление таблицы"
 PROMPT_CONFIRM_DELETE = "удаление записи"
 PROMPT_CONFIRM_TEMPLATE = 'Вы уверены, что хотите выполнить "{action}"? [y/n]: '
@@ -87,6 +92,7 @@ MSG_FUNCTION_TIME = "Функция {func_name} выполнилась за {ela
 MSG_PARSE_ERROR = "Не удалось разобрать команду ({error})."
 MSG_PARSE_HINT = "Проверьте синтаксис и кавычки."
 
+# Файлы таблиц и ошибки ввода/вывода
 TABLE_FILE_TEMPLATE = "{table}.json"
 MSG_META_SAVE_ERROR = "Ошибка сохранения метаданных в {filepath}: {error}"
 MSG_TABLE_SAVE_ERROR = (
