@@ -6,7 +6,7 @@ from prettytable import PrettyTable
 from ..constants import (
     COMMANDS,
     HELP_ALIGNMENT,
-    META_FP,
+    META_FILE,
     MSG_EXIT,
     MSG_INVALID_INFO,
     MSG_INVALID_VALUE,
@@ -50,7 +50,7 @@ from .utils import (
 def run():
     """Запускает основной цикл взаимодействия с пользователем."""
     while True:
-        metadata = load_metadata(META_FP)
+        metadata = load_metadata(META_FILE)
         user_input = prompt.string(PROMPT_INPUT)
 
         try:
@@ -75,7 +75,7 @@ def run():
                 if updated_metadata is None:
                     continue
                 metadata = updated_metadata
-                save_metadata(META_FP, metadata)
+                save_metadata(META_FILE, metadata)
             case "drop_table":
                 if len(args) < 2:
                     invalid_value = " ".join(args[1:]) or command
@@ -86,7 +86,7 @@ def run():
                 if updated_metadata is None:
                     continue
                 metadata = updated_metadata
-                save_metadata(META_FP, metadata)
+                save_metadata(META_FILE, metadata)
                 delete_table_file(table_name)
             case "list_tables":
                 list_tables(metadata)
