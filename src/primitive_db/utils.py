@@ -14,10 +14,12 @@ os.makedirs(DATA_PATH, exist_ok=True)
 
 @handle_db_errors(dict)
 def load_metadata(filepath) -> dict:
+    """Читает JSON с метаданными и возвращает словарь."""
     with open(filepath, "r") as file:
         return json.load(file)
 
 def save_metadata(filepath, data) -> None:
+    """Сохраняет метаданные в JSON-файл."""
     try:
         with open(filepath, "w") as file:
             json.dump(data, file)
@@ -26,11 +28,13 @@ def save_metadata(filepath, data) -> None:
 
 @handle_db_errors(list)
 def load_table_data(table_name) -> list[dict]:
+    """Загружает данные таблицы из JSON-файла."""
     path = os.path.join(DATA_PATH, TABLE_FILE_TEMPLATE.format(table=table_name))
     with open(path, "r") as file:
         return json.load(file)
 
 def save_table_data(table_name, data) -> None:
+    """Сохраняет данные таблицы в JSON-файл."""
     path = os.path.join(DATA_PATH, TABLE_FILE_TEMPLATE.format(table=table_name))
     try:
         with open(path, "w") as file:
@@ -44,6 +48,7 @@ def save_table_data(table_name, data) -> None:
         )
 
 def delete_table_file(table_name) -> None:
+    """Удаляет файл данных таблицы, если он существует."""
     path = os.path.join(DATA_PATH, TABLE_FILE_TEMPLATE.format(table=table_name))
     try:
         if os.path.exists(path):

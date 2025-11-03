@@ -15,6 +15,7 @@ from .constants import (
 
 
 def handle_db_errors(missing_default=None):
+    """Возвращает декоратор, перехватывающий типовые ошибки БД."""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -41,6 +42,7 @@ def handle_db_errors(missing_default=None):
 
 
 def confirm_action(action_name: str):
+    """Запрашивает подтверждение перед выполнением опасного действия."""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -58,6 +60,7 @@ def confirm_action(action_name: str):
 
 
 def log_time(func):
+    """Логирует время выполнения обёрнутой функции."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         start_time = time.monotonic()

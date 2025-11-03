@@ -37,6 +37,7 @@ from .utils import load_table_data
 
 
 def create_cacher() -> Callable[[Hashable, Callable[[], Any]], Any]:
+    """Создаёт кэшер с поддержкой сброса по имени таблицы."""
     cache: dict[Hashable, Any] = {}
 
     def cache_result(key: Hashable, value_func: Callable[[], Any]) -> Any:
@@ -65,6 +66,7 @@ _select_cache = create_cacher()
 
 @handle_db_errors()
 def create_table(metadata, table_name, columns: list[str]) -> dict:
+    """Добавляет описание новой таблицы в метаданные."""
     if table_name in metadata:
         raise ValueError(MSG_TABLE_EXISTS.format(name=table_name))
 
@@ -113,6 +115,7 @@ def create_table(metadata, table_name, columns: list[str]) -> dict:
 @confirm_action(PROMPT_CONFIRM_DROP)
 @handle_db_errors()
 def drop_table(metadata, table_name) -> dict:
+    """Удаляет описание таблицы из метаданных."""
     if table_name not in metadata:
         raise ValueError(MSG_TABLE_NOT_EXISTS.format(name=table_name))
 
@@ -123,6 +126,7 @@ def drop_table(metadata, table_name) -> dict:
 
 
 def list_tables(metadata) -> None:
+    """Выводит список известных таблиц."""
     if not metadata:
         print(MSG_NO_TABLES)
         return
@@ -132,6 +136,7 @@ def list_tables(metadata) -> None:
 
 
 def convert_value(value, column_type: str):
+    """Преобразует строковое значение к типу столбца."""
     if isinstance(value, str):
         value = value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
@@ -159,6 +164,7 @@ def convert_value(value, column_type: str):
 @handle_db_errors()
 @log_time
 def insert(metadata, table_name, values, table_data=None):
+    """Добавляет новую запись и возвращает обновлённые данные таблицы."""
     if table_name not in metadata:
         raise ValueError(MSG_TABLE_NOT_EXISTS.format(name=table_name))
 
@@ -199,6 +205,7 @@ def insert(metadata, table_name, values, table_data=None):
 @handle_db_errors(list)
 @log_time
 def select(table_name: str, where_clause: dict | None = None) -> list[dict]:
+    """Возвращает записи таблицы с учётом условий фильтра."""
     cache_key: Hashable
     if not where_clause:
         cache_key = (table_name, None)
@@ -220,6 +227,7 @@ def select(table_name: str, where_clause: dict | None = None) -> list[dict]:
 
 @handle_db_errors()
 def update(metadata, table_name, table_data, set_values, where_clause=None):
+    """Изменяет записи таблицы согласно условию."""
     if table_name not in metadata:
         raise ValueError(MSG_TABLE_NOT_EXISTS.format(name=table_name))
 
@@ -266,6 +274,7 @@ def update(metadata, table_name, table_data, set_values, where_clause=None):
 
 @confirm_action(PROMPT_CONFIRM_DELETE)
 def delete(table_name, table_data, where_clause=None):
+    """Удаляет записи таблицы по условию."""
     if table_data is None:
         table_data = []
 
@@ -299,6 +308,7 @@ def delete(table_name, table_data, where_clause=None):
 
 @handle_db_errors()
 def info(metadata, table_name, table_data):
+    """Печатает краткую информацию о таблице и количестве записей."""
     if table_name not in metadata:
         raise ValueError(MSG_TABLE_NOT_EXISTS.format(name=table_name))
 

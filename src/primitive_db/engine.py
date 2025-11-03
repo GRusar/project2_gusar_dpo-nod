@@ -16,6 +16,7 @@ from ..constants import (
     MSG_TABLE_NOT_EXISTS,
     MSG_UNKNOWN_COLUMN,
     MSG_UNKNOWN_COMMAND,
+    MSG_WELCOME,
     PROMPT_INPUT,
     TABLE_INFO_KEY,
 )
@@ -247,6 +248,7 @@ def run():
 
 def welcome():
     """Выводит приветственное сообщение и справку по командам."""
+    print(MSG_WELCOME)
     print_help()
 
 

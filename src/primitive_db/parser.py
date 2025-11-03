@@ -5,10 +5,12 @@ from .core import convert_value
 
 
 def _join_tokens(tokens: list[str]) -> str:
+    """Собирает список токенов обратно в строку."""
     return " ".join(tokens).strip()
 
 
 def _split_values(segment: str) -> list[str]:
+    """Разбивает сегмент списка значений с учётом кавычек."""
     parts: list[str] = []
     current: list[str] = []
     in_quotes = False
@@ -36,6 +38,7 @@ def _split_values(segment: str) -> list[str]:
     return parts
 
 def _split_assignments(segment: str) -> list[str]:
+    """Выделяет пары присваиваний из блока SET."""
     assignments: list[str] = []
     current: list[str] = []
     saw_equal = False
@@ -84,6 +87,7 @@ def _split_assignments(segment: str) -> list[str]:
     return assignments
 
 def parse_insert_tokens(tokens: list[str]) -> tuple[str, list[str]]:
+    """Парсит команду insert и возвращает имя таблицы и значения."""
     if len(tokens) < 5:
         raise ValueError(MSG_INVALID_VALUE.format(value="insert"))
 
@@ -105,6 +109,7 @@ def parse_insert_tokens(tokens: list[str]) -> tuple[str, list[str]]:
 
 
 def parse_select_tokens(tokens: list[str]) -> tuple[str, list[str] | None]:
+    """Парсит команду select и, при наличии, условие where."""
     if len(tokens) < 3:
         raise ValueError(MSG_INVALID_VALUE.format(value="select"))
     if tokens[1].lower() != "from":
@@ -127,6 +132,7 @@ def parse_where_condition_tokens(
     tokens: list[str],
     type_map: dict[str, str],
 ) -> dict[str, object]:
+    """Преобразует условие WHERE в словарь с приведёнными значениями."""
     if len(tokens) < 3:
         raise ValueError(MSG_INVALID_VALUE.format(value="WHERE"))
 
@@ -149,6 +155,7 @@ def parse_where_condition_tokens(
 def parse_update_tokens(
     tokens: list[str],
 ) -> tuple[str, dict[str, str], list[str] | None]:
+    """Парсит команду update, возвращая SET и WHERE части."""
     if len(tokens) < 4:
         raise ValueError(MSG_INVALID_VALUE.format(value="update"))
 
@@ -188,6 +195,7 @@ def parse_update_tokens(
 
 
 def parse_delete_tokens(tokens: list[str]) -> tuple[str, list[str]]:
+    """Парсит команду delete и извлекает условие WHERE."""
     if len(tokens) < 5:
         raise ValueError(MSG_INVALID_VALUE.format(value="delete"))
 

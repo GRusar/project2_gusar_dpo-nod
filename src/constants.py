@@ -77,6 +77,7 @@ PROMPT_CONFIRM_DROP = "удаление таблицы"
 PROMPT_CONFIRM_DELETE = "удаление записи"
 PROMPT_CONFIRM_TEMPLATE = 'Вы уверены, что хотите выполнить "{action}"? [y/n]: '
 PROMPT_INPUT = ">>> Введите команду: "
+MSG_WELCOME = "БД запущена. Список доступных команд:"
 
 MSG_DB_ERROR = "Ошибка: Таблица или столбец {error} не найден."
 MSG_UNEXPECTED_ERROR = "Произошла непредвиденная ошибка: {error}"
